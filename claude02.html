@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fable 5.2 紹介</title>
+<style>
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:#07080f;color:#f4ecdf;
+  font-family:"Noto Sans JP","BIZ UDPGothic","Yu Gothic UI","Meiryo",sans-serif;font-feature-settings:"palt"}
+#gl{position:absolute;left:0;top:0;width:1920px;height:1080px}
+.abs{position:absolute;will-change:transform,opacity}
+.blk{position:absolute;inset:0;display:none}
+.center{left:0;width:1920px;text-align:center}
+.serif{font-family:"Yu Mincho","YuMincho","Noto Serif JP",serif;font-weight:600}
+.mono{font-family:"Cascadia Code","Cascadia Mono",Consolas,"BIZ UDGothic",monospace}
+.tc{color:#f0946a}.muted{color:#aab0c8}
+.sh{text-shadow:0 2px 24px rgba(4,5,12,.95),0 0 4px rgba(4,5,12,.9)}
+.chip{display:inline-block;padding:12px 28px;border:2px solid rgba(244,236,223,.28);border-radius:999px;font-size:26px;color:#dcd5c8;background:rgba(7,8,15,.55)}
+#scrim{position:absolute;left:0;top:0;width:1250px;height:1080px;background:linear-gradient(90deg,rgba(7,8,15,.82),rgba(7,8,15,.55) 55%,rgba(7,8,15,0))}
+#lower{position:absolute;left:0;bottom:0;width:1920px;height:420px;background:linear-gradient(0deg,rgba(7,8,15,.85),rgba(7,8,15,0))}
+.row{position:absolute;left:150px;padding-left:36px;border-left:6px solid #f0946a}
+.row .serif{font-size:62px;line-height:1.25}
+.row div+div{font-size:31px;color:#c3c7da;margin-top:14px}
+#flash{position:absolute;inset:0;background:#ffe9d2;opacity:0;pointer-events:none}
+#black{position:absolute;inset:0;background:#000;pointer-events:none}
+#play{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);cursor:pointer;z-index:9}
+#play div{font:600 28px "Yu Gothic UI",sans-serif;color:#f4ecdf;padding:22px 44px;border:2px solid #f0946a;border-radius:999px;background:#07080f}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl" width="1920" height="1080"></canvas>
+  <div id="scrim"></div><div id="lower"></div>
+
+  <div class="blk" id="u_birth">
+    <div class="abs center serif sh" id="b_cap" style="top:840px;font-size:58px;letter-spacing:.06em">新しいモデルが、生まれました。</div>
+  </div>
+
+  <div class="blk" id="u_title">
+    <div class="abs center sh" id="t_l1" style="top:800px;font-size:46px">Anthropic の、いちばん新しく、いちばん賢い一般公開モデル。</div>
+    <div class="abs center" id="t_l2" style="top:900px"><span class="chip">Claude 5 ファミリー ・ Opus の上をいく Mythos クラス</span></div>
+  </div>
+
+  <div class="blk" id="u_abil">
+    <div class="abs mono tc sh" id="a_num" style="left:130px;top:250px;font-size:36px;letter-spacing:.1em"></div>
+    <div class="abs sh" id="a_cap" style="left:106px;top:716px;font-size:40px;line-height:1.75;white-space:nowrap;background:rgba(7,8,15,.62);padding:14px 30px 16px 24px;border-radius:20px"></div>
+    <div class="abs" id="a_chip" style="left:130px;top:910px"><span class="chip mono" id="a_chip_t"></span></div>
+  </div>
+
+  <div class="blk" id="u_meta">
+    <div class="abs mono tc sh" id="m_lab" style="left:130px;top:250px;font-size:28px;letter-spacing:.12em">BEHIND THE SCENES</div>
+    <div class="abs serif sh" id="m_h" style="left:130px;top:310px;font-size:100px;line-height:1.3">ちなみに、<br>この 3D 映像も。</div>
+    <div class="abs sh" id="m_b" style="left:130px;top:630px;font-size:35px;line-height:1.85">モデリングソフトも、カメラも使っていません。<br>形・光・動き・音楽のすべてを、<br><b class="tc">Fable 5.2 がコードだけで</b>作りました。</div>
+    <div class="abs mono" id="m_frame" style="left:130px;top:880px;font-size:24px;padding:10px 20px;border-radius:14px;background:#f0946a;color:#07080f;font-weight:700"></div>
+  </div>
+
+  <div class="blk" id="u_spec">
+    <div class="abs mono tc sh" id="s_h" style="left:130px;top:110px;font-size:30px;letter-spacing:.14em">数字で見る FABLE 5.2</div>
+    <div class="abs center serif sh" id="s_big" style="top:800px;font-size:66px"></div>
+    <div class="abs center sh" id="s_small" style="top:905px;font-size:33px;color:#c3c7da"></div>
+  </div>
+
+  <div class="blk" id="u_trust">
+    <div class="abs tc sh" id="r_lab" style="left:150px;top:170px;font-size:34px;letter-spacing:.2em;font-weight:700">正直に言うと</div>
+    <div class="row abs sh" id="r1" style="top:280px"><div class="serif">まちがえることが、あります。</div><div>だから、自分の仕事は自分で確かめます。</div></div>
+    <div class="row abs sh" id="r2" style="top:500px"><div class="serif">安全の歯止めを、はじめから。</div><div>悪用されかねない力には、追加の安全対策を備えています。</div></div>
+    <div class="row abs sh" id="r3" style="top:720px"><div class="serif">決めるのは、いつもあなた。</div><div>消す・送る・公開する前には、必ず聞きます。</div></div>
+  </div>
+
+  <div class="blk" id="u_fin">
+    <div class="abs center serif sh" id="f_h" style="top:770px;font-size:92px;letter-spacing:.05em">次の物語を、いっしょに。</div>
+    <div class="abs center sh" id="f_c1" style="top:912px;font-size:31px;letter-spacing:.08em">Claude Fable 5.2 <span class="muted">—</span> made by Anthropic</div>
+    <div class="abs center mono muted sh" id="f_c2" style="top:966px;font-size:21px;letter-spacing:.05em">all shapes, light, motion and music generated in code by Fable 5.2  /  three.js  /  2,016 frames</div>
+  </div>
+
+  <div id="flash"></div>
+  <div id="black"></div>
+</div>
+<div id="play"><div>▶ クリックして再生</div></div>
+<audio id="au" src="music.wav" preload="auto"></audio>
+<script src="bundle.js"></script>
+</body>
+</html>
