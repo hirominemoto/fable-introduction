@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Claude 自己紹介</title>
+<style>
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:#17140f;color:#f3ede2;
+  font-family:"Noto Sans JP","BIZ UDPGothic","Yu Gothic UI","Meiryo",sans-serif;font-feature-settings:"palt"}
+#bg{position:absolute;left:0;top:0}
+.scene{position:absolute;inset:0;display:none}
+.serif{font-family:"Yu Mincho","YuMincho","Noto Serif JP",serif;font-weight:600}
+.mono{font-family:"Cascadia Code","Cascadia Mono",Consolas,"BIZ UDGothic",monospace}
+.abs{position:absolute;will-change:transform,opacity}
+.center{left:0;width:1920px;text-align:center}
+.tc{color:#d97757}
+.muted{color:#a89d90}
+.cursor{display:inline-block;width:.5em;height:1.05em;background:#d97757;vertical-align:-.16em;margin-left:.12em;border-radius:4px}
+.chip{display:inline-block;padding:12px 26px;border:2px solid rgba(243,237,226,.22);border-radius:999px;font-size:26px;color:#cfc5b6}
+.panel{position:absolute;background:#221e19;border:2px solid rgba(243,237,226,.12);border-radius:28px;box-shadow:0 40px 90px rgba(0,0,0,.45);overflow:hidden}
+.bar3{position:absolute;left:0;top:0;right:0;height:56px;background:#2b2620;border-bottom:2px solid rgba(243,237,226,.08)}
+.bar3 i{position:absolute;top:20px;width:16px;height:16px;border-radius:50%;background:#4a4239}
+.bar3 span{position:absolute;left:110px;top:14px;font-size:22px;color:#a89d90}
+.dot{display:inline-block;width:14px;height:14px;border-radius:50%;background:rgba(243,237,226,.2);margin:0 9px}
+.k{color:#e08a6d}.f{color:#9cc5a1}.s{color:#e3c27a}.c{color:#857b6f}.p{color:#f3ede2}
+.card{position:absolute;top:390px;width:316px;height:350px;background:#fffaf2;border:2px solid #e6dccb;border-radius:30px;box-shadow:0 26px 60px rgba(90,60,30,.16);color:#2a241d;text-align:center}
+.card svg{margin-top:44px}
+.card b{display:block;font-size:30px;margin-top:24px;white-space:nowrap}
+.card span{display:block;font-size:24px;line-height:1.65;color:#7a6f62;margin:16px 10px 0}
+.row{position:absolute;left:230px;padding-left:36px;border-left:6px solid #d97757}
+.row .serif{font-size:66px;line-height:1.25}
+.row div+div{font-size:33px;color:#b9ae9f;margin-top:14px}
+#black{position:absolute;inset:0;background:#000;pointer-events:none}
+#play{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);cursor:pointer;z-index:9}
+#play div{font:600 28px "Yu Gothic UI",sans-serif;color:#f3ede2;padding:22px 44px;border:2px solid #d97757;border-radius:999px;background:#17140f}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="bg" width="1920" height="1080"></canvas>
+
+  <!-- 0: こんにちは -->
+  <div class="scene" id="s_hello">
+    <div class="abs center serif" style="top:478px;font-size:92px"><span class="mono tc" style="font-size:80px;margin-right:.35em">›</span><span id="h_txt"></span><span class="cursor" id="h_cur"></span></div>
+  </div>
+
+  <!-- 1: タイトル -->
+  <div class="scene" id="s_title">
+    <div class="abs center serif" id="t_h" style="top:420px;font-size:150px;letter-spacing:.02em">Claude です。</div>
+    <div class="abs center" id="t_l1" style="top:655px;font-size:44px">Anthropic がつくった AI アシスタント。</div>
+    <div class="abs center muted" id="t_l2" style="top:738px;font-size:35px">いまは Claude Code として、あなたのパソコンの中で働いています。</div>
+    <div class="abs center" id="t_chip" style="top:850px"><span class="chip mono">model : Claude Fable 5.2</span></div>
+  </div>
+
+  <!-- 2: できること -->
+  <div class="scene" id="s_abil">
+    <div id="a_left"></div>
+    <div class="panel" id="p1" style="left:1000px;top:230px;width:780px;height:600px">
+      <div class="bar3"><i style="left:26px"></i><i style="left:52px"></i><i style="left:78px"></i><span>資料.pdf</span></div>
+      <div id="p1_bars"></div>
+      <div class="abs" id="p1_scan" style="left:40px;width:700px;height:3px;background:#d97757;box-shadow:0 0 26px 6px rgba(217,119,87,.55)"></div>
+      <div class="abs mono" id="p1_cnt" style="left:60px;top:532px;font-size:26px;color:#cfc5b6"></div>
+      <div class="abs" id="p1_tag" style="right:50px;top:522px"><span class="chip" style="border-color:#d97757;color:#e9a48d">要点 4 件を発見</span></div>
+    </div>
+    <div class="panel" id="p2" style="left:1000px;top:230px;width:780px;height:600px"><svg id="p2_svg" width="780" height="600"></svg></div>
+    <div class="panel" id="p3" style="left:1000px;top:230px;width:780px;height:600px">
+      <div class="bar3"><i style="left:26px"></i><i style="left:52px"></i><i style="left:78px"></i><span class="mono">seikei.js</span></div>
+      <pre class="abs mono" id="p3_code" style="left:44px;top:86px;margin:0;font-size:24px;line-height:58px"></pre>
+    </div>
+    <div class="panel" id="p4" style="left:1000px;top:230px;width:780px;height:600px">
+      <div class="bar3"><i style="left:26px"></i><i style="left:52px"></i><i style="left:78px"></i><span class="mono">terminal</span></div>
+      <div class="abs mono" id="p4_term" style="left:48px;top:92px;font-size:27px;line-height:62px;white-space:pre"></div>
+    </div>
+    <div class="abs center" id="a_dots" style="top:940px"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div>
+  </div>
+
+  <!-- 3: この動画も -->
+  <div class="scene" id="s_meta">
+    <div class="abs mono tc" id="m_lab" style="left:150px;top:250px;font-size:28px;letter-spacing:.12em">BEHIND THE SCENES</div>
+    <div class="abs serif" id="m_h" style="left:150px;top:310px;font-size:104px;line-height:1.3">ちなみに、<br>この動画も。</div>
+    <div class="abs" id="m_b" style="left:150px;top:630px;font-size:35px;line-height:1.85;color:#d8cebf">カメラも、編集ソフトも使っていません。<br>2,016 コマの絵を 1 枚ずつコードで描き、<br>音楽は数式から合成しました。</div>
+    <div class="panel" id="m_p" style="left:1010px;top:190px;width:770px;height:570px">
+      <pre class="abs mono" id="m_src" style="left:36px;top:0;margin:0;font-size:19px;line-height:30px;color:#8f8578"></pre>
+      <div class="abs" style="left:0;right:0;top:0;height:110px;background:linear-gradient(#221e19,rgba(34,30,25,0))"></div>
+      <div class="abs" style="left:0;right:0;bottom:0;height:110px;background:linear-gradient(rgba(34,30,25,0),#221e19)"></div>
+      <div class="abs mono" id="m_frame" style="right:28px;top:24px;font-size:24px;padding:10px 20px;border-radius:14px;background:#d97757;color:#17140f;font-weight:700"></div>
+    </div>
+    <div class="abs" id="m_wave" style="left:1010px;top:800px;width:770px;height:90px"></div>
+  </div>
+
+  <!-- 4: いっしょに作ったもの -->
+  <div class="scene" id="s_apps">
+    <div class="abs center serif" id="ap_h" style="top:150px;font-size:80px;color:#2a241d">あなたとは、もういくつも作ってきました。</div>
+    <div id="ap_cards"></div>
+    <div class="abs center" id="ap_f" style="top:850px;font-size:34px;line-height:1.8;color:#5d5348">会話が終わると、私の記憶は消えます。<br><b style="color:#c4603f">だからメモを残して、次の私に引き継いでいます。</b></div>
+  </div>
+
+  <!-- 5: 正直に言うと -->
+  <div class="scene" id="s_honest">
+    <div class="abs tc" id="ho_lab" style="left:230px;top:150px;font-size:34px;letter-spacing:.2em;font-weight:700">正直に言うと</div>
+    <div class="row abs" id="ho1" style="top:260px"><div class="serif">まちがえることが、あります。</div><div>だから、自分の仕事は自分で確かめます。</div></div>
+    <div class="row abs" id="ho2" style="top:490px"><div class="serif">わからないことは、わからないと言います。</div><div>それらしい言葉で、ごまかしません。</div></div>
+    <div class="row abs" id="ho3" style="top:720px"><div class="serif">消す・送る・公開する前には、必ず聞きます。</div><div>決めるのは、いつもあなたです。</div></div>
+  </div>
+
+  <!-- 6: フィナーレ -->
+  <div class="scene" id="s_fin">
+    <div class="abs center serif" id="f_h" style="top:440px;font-size:112px;letter-spacing:.03em">次は、何を作りましょうか。</div>
+    <div class="abs" id="f_box" style="left:510px;top:668px;width:900px;height:96px;border-radius:48px;border:2px solid rgba(243,237,226,.28);background:rgba(243,237,226,.05);box-sizing:border-box;font-size:44px;line-height:90px;padding-left:44px"><span class="mono tc">›</span><span class="cursor" id="f_cur" style="margin-left:.5em"></span></div>
+    <div class="abs center" id="f_c1" style="top:846px;font-size:32px;letter-spacing:.08em">Claude <span class="muted">—</span> made by Anthropic</div>
+    <div class="abs center mono muted" id="f_c2" style="top:908px;font-size:22px;letter-spacing:.06em">HTML · JavaScript · ffmpeg  /  2,016 frames  /  music synthesized from math</div>
+  </div>
+
+  <div id="black"></div>
+</div>
+<div id="play" style="display:none"><div>▶ クリックして再生</div></div>
+<audio id="au" src="music.wav" preload="auto"></audio>
+
+<script>
+const FPS = 30, DUR = 67.2, TOTAL = Math.round(FPS * DUR), W = 1920, H = 1080;
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const eb = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const lerp = (a, b, x) => a + (b - a) * x;
+const $ = id => document.getElementById(id);
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function st(el, o, tx = 0, ty = 0, sc = 1) { el.style.opacity = o; el.style.transform = `translate(${tx}px,${ty}px) scale(${sc})`; }
+function rise(el, t, t0, d = .6, dy = 34) { const p = eo(P(t, t0, t0 + d)); st(el, p, 0, (1 - p) * dy); }
+function split(el) { const s = [...el.textContent]; el.textContent = ''; return s.map(c => { const e = document.createElement('span'); e.textContent = c; e.style.display = 'inline-block'; if (c === ' ') e.style.width = '.3em'; el.appendChild(e); return e; }); }
+function chars(sp, t, t0, stag = .06, dy = 50) { sp.forEach((e, i) => { const p = eo(P(t, t0 + i * stag, t0 + i * stag + .55)); st(e, p, 0, (1 - p) * dy); }); }
+const show = (el, on) => { el.style.display = on ? 'block' : 'none'; };
+
+// ---------- 背景・パーティクル・スターバースト(すべて時刻 t の関数) ----------
+const ctx = $('bg').getContext('2d');
+const pr = rng(7), parts = Array.from({ length: 120 }, () => ({ x: pr() * W, y: pr() * H, v: 8 + pr() * 26, r: 1 + pr() * 2.4, a: .1 + pr() * .28, ph: pr() * 6.28 }));
+const br = rng(42), RAYS = Array.from({ length: 12 }, (_, i) => ({ a: i / 12 * Math.PI * 2 + (br() - .5) * .16, len: .7 + br() * .3, w: .105 + br() * .04, ord: br() }));
+function drawParts(t, rgb, k) {
+  for (const p of parts) {
+    const x = p.x + Math.sin(t * .3 + p.ph) * 22, y = ((p.y - p.v * t) % H + H) % H;
+    ctx.fillStyle = `rgba(${rgb},${p.a * k * (.6 + .4 * Math.sin(t * .8 + p.ph))})`;
+    ctx.beginPath(); ctx.arc(x, y, p.r, 0, 6.2832); ctx.fill();
+  }
+}
+function drawDark(t) {
+  ctx.fillStyle = '#17140f'; ctx.fillRect(0, 0, W, H);
+  const gx = 960 + Math.sin(t * .21) * 320, gy = 540 + Math.cos(t * .17) * 170;
+  const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, 950);
+  g.addColorStop(0, 'rgba(217,119,87,.17)'); g.addColorStop(1, 'rgba(217,119,87,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  drawParts(t, '243,237,226', 1);
+  const v = ctx.createRadialGradient(960, 540, 500, 960, 540, 1150);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.5)');
+  ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+}
+function drawLight(t) {
+  ctx.fillStyle = '#f3ede2'; ctx.fillRect(0, 0, W, H);
+  const gx = 960 + Math.sin(t * .21) * 320, gy = 420 + Math.cos(t * .17) * 170;
+  const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, 900);
+  g.addColorStop(0, 'rgba(255,252,246,.9)'); g.addColorStop(1, 'rgba(255,252,246,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  drawParts(t, '217,119,87', 1.5);
+}
+function clipCircle(r, fn) { ctx.save(); ctx.beginPath(); ctx.arc(960, 540, r, 0, 6.2832); ctx.clip(); fn(); ctx.restore(); }
+function drawBurst(t, cx, cy, R, g, alpha) {
+  if (alpha <= 0 || g <= 0) return;
+  R *= 1 + .025 * Math.sin(t * 1.8);
+  ctx.save(); ctx.globalAlpha = alpha; ctx.translate(cx, cy); ctx.rotate(.05 * Math.sin(t * .5) + (1 - eo(g)) * -.6);
+  const gl = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 2.4);
+  gl.addColorStop(0, `rgba(217,119,87,${.32 * g})`); gl.addColorStop(1, 'rgba(217,119,87,0)');
+  ctx.fillStyle = gl; ctx.fillRect(-R * 2.4, -R * 2.4, R * 4.8, R * 4.8);
+  ctx.strokeStyle = '#d97757'; ctx.lineCap = 'round';
+  for (const r of RAYS) {
+    const gi = eb(clamp(g * 1.6 - r.ord * .6)); if (gi <= .02) continue;
+    ctx.lineWidth = R * r.w * Math.min(1, gi);
+    ctx.beginPath(); ctx.moveTo(Math.cos(r.a) * R * .17, Math.sin(r.a) * R * .17);
+    ctx.lineTo(Math.cos(r.a) * R * Math.max(.18, r.len * gi), Math.sin(r.a) * R * Math.max(.18, r.len * gi)); ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawBg(t) {
+  drawDark(t);
+  const a = eio(P(t, 38.2, 39.1)), b = eio(P(t, 47.5, 48.4));
+  if (a > 0 && b < 1) { clipCircle(a * 1130, () => drawLight(t)); if (b > 0) clipCircle(b * 1130, () => drawDark(t)); }
+  if (t >= 3 && t < 12) {
+    const m = eio(P(t, 4.8, 5.8));
+    drawBurst(t, 960, lerp(540, 285, m), lerp(190, 120, m), P(t, 3.0, 4.4), 1 - P(t, 11.4, 12));
+  } else if (t >= 57.6) drawBurst(t, 960, 270, 115, P(t, 57.8, 59.2), 1);
+}
+
+// ---------- 各シーンの部品づくり ----------
+const sc = {}; for (const k of ['hello', 'title', 'abil', 'meta', 'apps', 'honest', 'fin']) sc[k] = $('s_' + k);
+const HELLO = 'こんにちは。';
+const tH = split($('t_h')), fH = split($('f_h')), apH = split($('ap_h'));
+
+// できること 4 つ
+const ABIL = [
+  ['01', '読む', '長い資料も、何百ものファイルも。<br>大事なところを見つけ出します。'],
+  ['02', '考える', 'すぐに答えを出さず、筋道を<br>何通りも確かめてから。'],
+  ['03', '書く', '文章も、コードも、Excel の表も。<br>目的に合わせて形にします。'],
+  ['04', '動かす', '書いて終わりにしません。<br>動かして、確かめてから報告します。'],
+];
+const aL = ABIL.map(([n, v, c]) => {
+  const d = document.createElement('div'); d.className = 'abs'; d.style.cssText = 'left:150px;top:235px;width:820px';
+  d.innerHTML = `<div class="abs mono tc" style="top:0;font-size:36px;letter-spacing:.1em">${n} <span style="color:#6b6157">/ 04</span></div><div class="abs serif" style="top:50px;font-size:${v.length > 2 ? 200 : 240}px;white-space:nowrap">${v}</div><div class="abs" style="top:400px;font-size:39px;line-height:1.75;color:#d8cebf;white-space:nowrap">${c}</div>`;
+  $('a_left').appendChild(d); return { d, num: d.children[0], verb: split(d.children[1]), cap: d.children[2] };
+});
+const panels = [$('p1'), $('p2'), $('p3'), $('p4')], dots = [...$('a_dots').children];
+
+// 01 読む
+const BW = [.9, .74, .95, .6, .86, .9, .7, .95, .5, .8, .92, .66, .4], HL = new Set([2, 6, 7, 11]);
+const bars = BW.map((w, i) => { const e = document.createElement('div'); e.className = 'abs'; e.style.cssText = `left:60px;top:${96 + i * 32}px;width:${w * 640}px;height:14px;border-radius:7px`; $('p1_bars').appendChild(e); return e; });
+
+// 02 考える
+const NS = 'http://www.w3.org/2000/svg', svg = $('p2_svg');
+const mk = (tag, at) => { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); svg.appendChild(e); return e; };
+const ND = [[90, 300, .4], [280, 150, .95], [280, 300, .95], [280, 450, .95], [480, 105, 1.55], [480, 235, 1.55], [480, 365, 1.55], [480, 495, 1.55], [680, 300, 2.15]];
+const ED = [[0, 1, .6], [0, 2, .6], [0, 3, .6], [1, 4, 1.2], [1, 5, 1.2], [2, 5, 1.2], [2, 6, 1.2], [3, 6, 1.2], [3, 7, 1.2], [4, 8, 1.8], [5, 8, 1.8], [6, 8, 1.8], [7, 8, 1.8]];
+const PATH = [[0, 2, 2.9], [2, 6, 3.15], [6, 8, 3.4]], REJ = new Set([1, 3, 4, 7]);
+const eLen = (a, b) => Math.hypot(ND[a][0] - ND[b][0], ND[a][1] - ND[b][1]);
+const edges = ED.map(([a, b, t0]) => ({ a, b, t0, len: eLen(a, b), el: mk('line', { x1: ND[a][0], y1: ND[a][1], x2: ND[b][0], y2: ND[b][1], stroke: 'rgba(243,237,226,.3)', 'stroke-width': 3, 'stroke-linecap': 'round' }) }));
+const hot = PATH.map(([a, b, t0]) => ({ a, b, t0, len: eLen(a, b), el: mk('line', { x1: ND[a][0], y1: ND[a][1], x2: ND[b][0], y2: ND[b][1], stroke: '#d97757', 'stroke-width': 7, 'stroke-linecap': 'round' }) }));
+const nodes = ND.map(([x, y, t0]) => ({ t0, el: mk('circle', { cx: x, cy: y, r: 0, 'stroke-width': 3 }) }));
+const check = mk('path', { d: 'M668 300l9 10 17-20', fill: 'none', stroke: '#17140f', 'stroke-width': 6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+
+// 03 書く
+const CODE = [['c', '// LINE の文面を、グループ別の表に整える\n'], ['k', 'function '], ['f', 'seikei'], ['p', '(text) {\n'], ['k', '  const '], ['p', 'rows = text.'], ['f', 'split'], ['p', '('], ['s', '"\\n"'], ['p', ').'], ['f', 'map'], ['p', '(parse);\n'], ['k', '  const '], ['p', 'groups = '], ['f', 'groupBy'], ['p', '(rows, r => r.group);\n'], ['k', '  return '], ['f', 'toExcel'], ['p', '(groups);\n'], ['p', '}']];
+const CODE_N = CODE.reduce((s, c) => s + c[1].length, 0);
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// 04 動かす
+const TERM = [[.5, 'cmd', 'node build.mjs'], [1.05, 'ok', 'ビルド完了 (1.2s)'], [1.6, 'cmd', 'npm test'], [2.15, 'ok', '24 件のテストに合格'], [2.7, 'cmd', 'git push'], [3.25, 'ok', '公開ページを更新しました']];
+
+// この動画も:このファイル自身のソースを流す
+$('m_src').textContent = document.currentScript.textContent.split('\n').filter(l => l.trim()).slice(8, 78).join('\n');
+const wave = Array.from({ length: 56 }, (_, i) => { const e = document.createElement('div'); e.className = 'abs'; e.style.cssText = `left:${i * 13.8}px;width:7px;border-radius:4px;background:#d97757`; $('m_wave').appendChild(e); return e; });
+
+// いっしょに作ったもの
+const IC = a => `<svg width="96" height="96" viewBox="0 0 96 96" fill="none" stroke="#d97757" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">${a}</svg>`;
+const APPS = [
+  ['議事録アプリ', 'ミーティングの記録を<br>読みやすい議事録に', '<rect x="24" y="14" width="48" height="68" rx="8"/><path d="M36 34h24M36 48h24M36 62h14"/>'],
+  ['ペチ島', 'コードだけで描いた<br>歩き回れる 3D の島', '<path d="M12 68c14-16 58-16 72 0"/><path d="M50 56c-2-14 0-24 6-32"/><path d="M56 24c-10-6-18-4-22 2M56 24c10-4 18 0 20 8M56 24c-2-8-8-12-14-12"/><path d="M10 82c8-5 14 5 22 0s14 5 22 0 14 5 22 0"/>'],
+  ['遅れ申請 整形ツール', 'LINE で届く文面を<br>グループ別の管理表に', '<rect x="14" y="20" width="68" height="56" rx="8"/><path d="M14 38h68M14 57h68M38 20v56"/>'],
+  ['ガントチャート', 'いくつもの計画の<br>進み具合を一目で', '<path d="M14 14v68" stroke-width="4"/><path d="M26 28h30M38 48h40M30 68h24" stroke-width="11"/>'],
+  ['AI 秘書', '毎朝、メールと予定を<br>まとめて報告', '<rect x="14" y="26" width="68" height="46" rx="8"/><path d="M16 30l32 24 32-24"/>'],
+];
+const cards = APPS.map(([n, d, ic], i) => { const e = document.createElement('div'); e.className = 'card'; e.style.left = (110 + i * 346) + 'px'; e.innerHTML = IC(ic) + `<b>${n}</b><span>${d}</span>`; $('ap_cards').appendChild(e); return e; });
+const rows = [$('ho1'), $('ho2'), $('ho3')], HT = [48.8, 51.6, 54.4];
+
+// ---------- 1 コマを描く:時刻 t(秒)だけで画面のすべてが決まる ----------
+function renderAt(t) {
+  drawBg(t);
+  let on;
+
+  on = t < 4.8; show(sc.hello, on);
+  if (on) {
+    $('h_txt').textContent = HELLO.slice(0, clamp(Math.floor((t - 1.0) / .16) + 1, 0, HELLO.length));
+    $('h_cur').style.opacity = (t > .95 && t < 2.2) || Math.floor(t * 2.5) % 2 === 0 ? 1 : 0;
+    sc.hello.style.opacity = P(t, .2, .7) * (1 - P(t, 2.7, 3.0));
+  }
+
+  on = t >= 4.8 && t < 12; show(sc.title, on);
+  if (on) {
+    sc.title.style.opacity = 1 - P(t, 11.45, 12);
+    chars(tH, t, 5.5, .07); rise($('t_l1'), t, 6.9); rise($('t_l2'), t, 8.1); rise($('t_chip'), t, 9.3);
+  }
+
+  on = t >= 12 && t < 31.2; show(sc.abil, on);
+  if (on) {
+    const k = Math.min(3, Math.floor((t - 12) / 4.8)), lt = t - 12 - k * 4.8, out = 1 - P(lt, 4.42, 4.8);
+    aL.forEach((a, i) => { show(a.d, i === k); if (i === k) { a.d.style.opacity = out; rise(a.num, lt, .05, .5, 20); chars(a.verb, lt, .15, .1, 70); rise(a.cap, lt, .55); } });
+    panels.forEach((p, i) => { show(p, i === k); if (i === k) { const q = eo(P(lt, .15, .75)); st(p, q * out, 0, (1 - q) * 46); } });
+    dots.forEach((d, i) => { d.style.background = i === k ? '#d97757' : 'rgba(243,237,226,.2)'; d.style.width = i === k ? '40px' : '14px'; d.style.borderRadius = '7px'; });
+    $('a_dots').style.opacity = P(t, 12.2, 12.8) * (1 - P(t, 30.8, 31.2));
+    if (k === 0) {
+      const s = eio(P(lt, .8, 3.6)), y = lerp(78, 96 + 13 * 32, s);
+      bars.forEach((b, i) => { const hit = 96 + i * 32 < y; b.style.background = hit ? (HL.has(i) ? '#d97757' : 'rgba(243,237,226,.55)') : 'rgba(243,237,226,.15)'; b.style.boxShadow = hit && HL.has(i) ? '0 0 0 9px rgba(217,119,87,.2)' : 'none'; });
+      st($('p1_scan'), P(lt, .7, .9) * (1 - P(lt, 3.6, 3.8)), 0, y);
+      $('p1_cnt').textContent = '読んだページ  ' + Math.round(1284 * s).toLocaleString('en-US');
+      const q = eb(P(lt, 3.5, 3.9)); st($('p1_tag'), P(lt, 3.5, 3.7), 0, 0, .7 + .3 * q);
+    } else if (k === 1) {
+      edges.forEach(e => { e.el.setAttribute('stroke-dasharray', e.len); e.el.setAttribute('stroke-dashoffset', e.len * (1 - eo(P(lt, e.t0, e.t0 + .4)))); e.el.style.opacity = lerp(1, .3, P(lt, 2.5, 2.9) * (REJ.has(e.a) || REJ.has(e.b) ? 1 : 0)); });
+      hot.forEach(e => { e.el.setAttribute('stroke-dasharray', e.len); e.el.setAttribute('stroke-dashoffset', e.len * (1 - P(lt, e.t0, e.t0 + .25))); e.el.style.opacity = lt >= e.t0 ? 1 : 0; });
+      const lit = [2.9, 9, 3.15, 9, 9, 9, 3.4, 9, 3.65];
+      nodes.forEach((n, i) => { const h = P(lt, lit[i], lit[i] + .15); n.el.setAttribute('r', Math.max(0, (i === 8 || i === 0 ? 30 : 20) * eb(P(lt, n.t0, n.t0 + .4)) * (1 + .18 * Math.sin(Math.PI * P(lt, lit[i], lit[i] + .3))))); n.el.setAttribute('fill', h > .5 ? '#d97757' : '#2f2923'); n.el.setAttribute('stroke', h > .5 ? '#d97757' : 'rgba(243,237,226,.6)'); n.el.style.opacity = REJ.has(i) ? lerp(1, .25, P(lt, 2.5, 2.9)) : 1; });
+      check.style.opacity = P(lt, 3.7, 3.85);
+    } else if (k === 2) {
+      let n = Math.floor(P(lt, .6, 3.6) * CODE_N), h = '';
+      for (const [c, s] of CODE) { if (n <= 0) break; h += `<span class="${c}">${esc(s.slice(0, n))}</span>`; n -= s.length; }
+      $('p3_code').innerHTML = h + (lt < 3.6 || Math.floor(lt * 2.5) % 2 === 0 ? '<span class="cursor" style="height:1.1em;width:.55em"></span>' : '');
+    } else {
+      let h = '';
+      for (const [t0, kind, s] of TERM) { if (lt < t0) break; h += kind === 'cmd' ? `<span class="muted">$ </span>${s.slice(0, Math.ceil(P(lt, t0, t0 + .4) * s.length))}\n` : `<span class="f">✓ ${s}</span>\n`; }
+      $('p4_term').innerHTML = h + (Math.floor(lt * 2.5) % 2 === 0 ? '<span class="cursor"></span>' : '');
+    }
+  }
+
+  on = t >= 31.2 && t < 38.4; show(sc.meta, on);
+  if (on) {
+    sc.meta.style.opacity = 1 - P(t, 37.8, 38.25);
+    rise($('m_lab'), t, 31.4, .5, 20); rise($('m_h'), t, 31.6, .8, 50); rise($('m_b'), t, 32.9, .8);
+    const q = eo(P(t, 31.5, 32.2)); st($('m_p'), q, 0, (1 - q) * 46);
+    $('m_src').style.transform = `translateY(${-(t - 31.2) * 95}px)`;
+    $('m_frame').textContent = `frame ${String(Math.round(t * FPS)).padStart(4, '0')} / ${TOTAL}`;
+    wave.forEach((w, i) => { const h = 8 + 78 * Math.abs(Math.sin(t * 5 + i * .6) * Math.sin(t * 1.7 + i * .23)); w.style.height = h + 'px'; w.style.top = (45 - h / 2) + 'px'; w.style.opacity = (.35 + .65 * h / 86) * P(t, 32, 32.6); });
+  }
+
+  on = t >= 38.4 && t < 48; show(sc.apps, on);
+  if (on) {
+    sc.apps.style.opacity = 1 - P(t, 47.1, 47.5);
+    chars(apH, t, 38.8, .03, 40);
+    cards.forEach((c, i) => { const t0 = 39.6 + i * .35, q = P(t, t0, t0 + .55); st(c, P(t, t0, t0 + .25), 0, (1 - eo(q)) * 70, .82 + .18 * eb(q)); });
+    rise($('ap_f'), t, 43.4, .8);
+  }
+
+  on = t >= 48 && t < 57.6; show(sc.honest, on);
+  if (on) {
+    sc.honest.style.opacity = 1 - P(t, 57.1, 57.6);
+    rise($('ho_lab'), t, 48.3, .5, 20);
+    rows.forEach((r, i) => { const p = eo(P(t, HT[i], HT[i] + .7)), dim = i < 2 ? lerp(1, .6, P(t, HT[i + 1] - .1, HT[i + 1] + .5)) : 1; st(r, p * dim, (1 - p) * -50, 0); st(r.children[1], eo(P(t, HT[i] + .8, HT[i] + 1.4))); });
+  }
+
+  on = t >= 57.6; show(sc.fin, on);
+  if (on) {
+    chars(fH, t, 59.0, .08, 60);
+    const q = eo(P(t, 62.4, 63.1)); st($('f_box'), q, 0, (1 - q) * 30);
+    $('f_cur').style.opacity = Math.floor(t * 2.5) % 2 === 0 ? 1 : 0;
+    rise($('f_c1'), t, 63.6, .7, 20); rise($('f_c2'), t, 64.1, .7, 20);
+  }
+
+  $('black').style.opacity = Math.max(1 - P(t, 0, .6), P(t, 66.1, 67.1));
+}
+window.renderAt = renderAt; window.TOTAL = TOTAL; window.FPS = FPS;
+
+// ---------- ブラウザでそのまま再生する(撮影時は ?capture を付けて止めておく) ----------
+function fit() { const s = Math.min(innerWidth / W, innerHeight / H); $('stage').style.transform = `translate(${(innerWidth - W * s) / 2}px,${(innerHeight - H * s) / 2}px) scale(${s})`; }
+addEventListener('resize', fit); fit(); renderAt(0);
+if (!location.search.includes('capture')) {
+  const au = $('au'), pl = $('play'); pl.style.display = 'flex';
+  pl.onclick = () => {
+    pl.style.display = 'none'; let t0 = performance.now(), useAu = true;
+    au.currentTime = 0; au.play().catch(() => { useAu = false; });
+    const loop = () => { const t = useAu && !au.paused ? au.currentTime : (performance.now() - t0) / 1000; if (t >= DUR - .02 || au.ended) { renderAt(DUR - .001); pl.style.display = 'flex'; return; } renderAt(t); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  };
+}
+</script>
+</body>
+</html>
